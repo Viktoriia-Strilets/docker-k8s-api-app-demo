@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pgadmin-pod
+  labels:
+    app: pgadmin
+spec:
+  securityContext:
+    fsGroup: 5050
+  volumes:
+    - name: host-volume
+      hostPath:
+        path: /tmp/k8s-data
+        type: DirectoryOrCreate
+
+  containers:
+    - name: pgadmin
+      image: dpage/pgadmin4
+      securityContext:
+        runAsUser: 5050
+      env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: admin@example.com
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: admin
+        - name: PGADMIN_LISTEN_PORT
+          value: "8080"
+      ports:
+        - containerPort: 8080
+      volumeMounts:
+        - name: host-volume
+          mountPath: /var/lib/pgadmin
